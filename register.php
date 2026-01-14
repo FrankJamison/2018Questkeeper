@@ -18,8 +18,21 @@ $error_text = "";
 $registration_error_text = "";
 
 // Connect to Database
-$dbc = mysqli_connect($host, $web_user, $pwd, $dbname)
-	or die('Error connecting to database server');
+if (!function_exists('mysqli_connect')) {
+	http_response_code(500);
+	die('QuestKeeper error: PHP mysqli extension is not enabled. Enable/ install mysqli for your PHP runtime.');
+}
+
+$dbc = @mysqli_connect($host, $web_user, $pwd, $dbname);
+if (!$dbc) {
+	http_response_code(500);
+	$message = 'QuestKeeper error: failed to connect to MySQL. Check includes/db.local.inc.php (preferred) or includes/db.config.inc.php.';
+	$isLocal = isset($_SERVER['HTTP_HOST']) && stripos($_SERVER['HTTP_HOST'], 'localhost') !== false;
+	if ($isLocal) {
+		$message .= "\n\nMySQL error: " . mysqli_connect_error();
+	}
+	die(nl2br(htmlspecialchars($message, ENT_QUOTES)));
+}
 
 // Form display variable
 $login_form = true;

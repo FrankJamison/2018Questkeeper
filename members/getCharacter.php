@@ -14,8 +14,25 @@ require_once('../includes/variables.inc.php');
 require_once('../includes/session.inc.php');
 
 // Connect to Database
-$dbc = mysqli_connect($host, $web_user, $pwd, $dbname)
-    or die('Error connecting to database server');
+header('Content-Type: application/json; charset=utf-8');
+
+if (!function_exists('mysqli_connect')) {
+    http_response_code(500);
+    echo json_encode(['error' => 'QuestKeeper error: PHP mysqli extension is not enabled. Enable/ install mysqli for your PHP runtime.']);
+    exit;
+}
+
+$dbc = @mysqli_connect($host, $web_user, $pwd, $dbname);
+if (!$dbc) {
+    http_response_code(500);
+    $message = 'QuestKeeper error: failed to connect to MySQL. Check includes/db.local.inc.php (preferred) or includes/db.config.inc.php.';
+    $isLocal = isset($_SERVER['HTTP_HOST']) && stripos($_SERVER['HTTP_HOST'], 'localhost') !== false;
+    if ($isLocal) {
+        $message .= ' MySQL error: ' . mysqli_connect_error();
+    }
+    echo json_encode(['error' => $message]);
+    exit;
+}
 
 // Member Username
 $memberUsername = $_SESSION['memberUsername'];
