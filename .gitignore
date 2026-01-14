@@ -1,0 +1,7 @@
+# Local-only secrets / environment overrides
+includes/db.config.inc.php
+includes/db.local.inc.php
+
+# Common noise
+.DS_Store
+Thumbs.db

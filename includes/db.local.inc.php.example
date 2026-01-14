@@ -1,0 +1,12 @@
+<?php
+
+// Local database credentials (DO NOT COMMIT)
+// Copy this file to: includes/db.local.inc.php
+
+$host = "localhost";
+$web_user = "root";
+$pwd = "";
+$dbname = "questkeeper";
+$charset = "utf8mb4";
+
+?>

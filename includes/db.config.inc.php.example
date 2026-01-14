@@ -1,0 +1,13 @@
+<?php
+
+// Database credentials/config (environment-specific; DO NOT COMMIT)
+// Copy this file to: includes/db.config.inc.php
+// Use the appropriate values for your environment (local/dev/staging/prod).
+
+$host = "localhost";
+$web_user = "root";
+$pwd = "";
+$dbname = "questkeeper";
+$charset = "utf8mb4";
+
+?>
