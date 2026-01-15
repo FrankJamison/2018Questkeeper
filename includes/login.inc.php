@@ -10,7 +10,7 @@ function userLogin($dbc, &$error_text, $ROOT)
 
     // Error Reporting
     error_reporting(E_ALL);
-    ini_set('display_errors', '1');
+    ini_set('display_errors', '0');
 
     // Login Form display variable
     $login_form = true;
@@ -19,8 +19,13 @@ function userLogin($dbc, &$error_text, $ROOT)
     $query = "SELECT userID, userUsername, userHashedPassword, userFirstName, userLastName FROM users";
 
     // Database Login Query Result
-    $result = mysqli_query($dbc, $query)
-        or die("Error querying database");
+    $result = mysqli_query($dbc, $query);
+    if (!$result) {
+        http_response_code(500);
+        $sqlError = function_exists('mysqli_error') ? mysqli_error($dbc) : '';
+        error_log('QuestKeeper DB query failed in userLogin(): ' . $sqlError);
+        die('QuestKeeper error: database query failed.');
+    }
 
     $storedMemberID = '';
     $storedMemberUsername = '';

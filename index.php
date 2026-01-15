@@ -2,6 +2,8 @@
 
 ob_start();
 
+require_once(__DIR__ . '/includes/bootstrap.inc.php');
+
 // Debug Flag
 $debug = false;
 
@@ -24,7 +26,7 @@ if (!function_exists('mysqli_connect')) {
 $dbc = @mysqli_connect($host, $web_user, $pwd, $dbname);
 if (!$dbc) {
 	http_response_code(500);
-	$message = 'QuestKeeper error: failed to connect to MySQL. Check includes/db.local.inc.php (preferred) or includes/db.config.inc.php.';
+	$message = 'QuestKeeper error: failed to connect to MySQL. Check includes/db.config.inc.php (preferred) or includes/db.local.inc.php.';
 	$isLocal = isset($_SERVER['HTTP_HOST']) && stripos($_SERVER['HTTP_HOST'], 'localhost') !== false;
 	if ($isLocal) {
 		$message .= "\n\nMySQL error: " . mysqli_connect_error();

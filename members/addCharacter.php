@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/../includes/bootstrap.inc.php');
+
 ob_start();
 
 // Debug Flag

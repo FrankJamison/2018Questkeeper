@@ -8,12 +8,12 @@ $dbname = "";
 $charset = "utf8";
 
 // Load environment-specific DB credentials if present (git-ignored)
-// Prefer local overrides first, then fall back to the deployment config.
-$dbLocalPath = __DIR__ . '/db.local.inc.php';
+// Prefer deployment overrides first, then fall back to the local config.
+$dbLocalPath = __DIR__ . '/db.config.inc.php';
 if (is_file($dbLocalPath)) {
     require $dbLocalPath;
 } else {
-    $dbConfigPath = __DIR__ . '/db.config.inc.php';
+    $dbConfigPath = __DIR__ . '/db.local.inc.php';
     if (is_file($dbConfigPath)) {
         require $dbConfigPath;
     }

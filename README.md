@@ -1,116 +1,117 @@
-# QuestKeeper Character Tracker
+# QuestKeeper (2018) — D&D 5e Character Tracker
 
-QuestKeeper is a web-based Dungeons & Dragons 5e character manager originally created for the UC Davis WEB515 course (2018) focused on building web applications with AJAX.
+QuestKeeper is a classic PHP + MySQL web app for managing Dungeons & Dragons 5e character sheets. It was built for UC Davis WEB515 (2018) with a focus on practical web application fundamentals: authentication, CRUD, AJAX-driven UI updates, and a relational data model.
 
-It provides registration/login plus a member area for creating, viewing, and updating character sheets backed by a MySQL database.
+This repository is presented as a portfolio-style code sample: it’s small, readable, and demonstrates end-to-end delivery from database schema to UI interactions.
 
-## What It Does
-- Member registration and authentication
-- Create and update D&D 5e characters (core sheet fields like ability scores, saves, skills, equipment, and roleplay notes)
-- Server-rendered pages with AJAX endpoints for loading character data without full page refreshes
-- MySQL schema seeded with common 5e reference data (classes, backgrounds, races, alignments, levels)
+## Quick Snapshot (Employer / Recruiter)
+- **Product**: Character sheet manager with registration/login and a member area
+- **Core skills demonstrated**: PHP server-rendered pages, session auth, MySQL schema + seed data, AJAX/JSON endpoints, client-side derived-stat calculations
+- **UI approach**: Form-based, “sheet-like” layout with dynamic computed fields (saves/skills/etc.) and partial page updates
+- **Operational touches**: git-ignored environment config and production-safe error logging
+
+## Features
+- User registration + login
+- Create, view, and update character sheets (ability scores, saves, skills, equipment, roleplay notes)
+- AJAX endpoints to load character data without full page refreshes
+- Seeded reference data for common 5e lists (classes, backgrounds, races, alignments, levels)
+
+## Design & UX Notes
+- **Sheet-first layout**: The UI is organized like a paper character sheet to reduce cognitive load.
+- **Immediate feedback**: JavaScript calculates derived values (e.g., modifiers, saves, skills, passive perception) as inputs change.
+- **Progressive enhancement**: Pages are server-rendered; AJAX improves responsiveness when loading character data.
 
 ## Tech Stack
-- PHP (server-rendered pages + JSON endpoints)
+- PHP
 - MySQL / MariaDB
 - Bootstrap + jQuery (loaded via CDN)
 
-## Key Files And Entry Points
-- `index.php`: Home page + login form
-- `register.php`: Registration page
-- `members/`: Authenticated “member area” pages and endpoints
-	- `members/index.php`: Member landing page
-	- `members/addCharacter.php`: Create a new character
-	- `members/editCharacter.php`: Edit an existing character
-	- `members/getCharacter.php`: JSON endpoint to fetch a character by `characterID`
-	- `members/updateCharacter.php`: Persists posted character changes
-	- `members/submitNewCharacter.php`: Persists a new character
-	- `members/logout.php`: Ends the session
-- `includes/`: Shared PHP includes
-	- `includes/variables.inc.php`: Database connection settings
-	- `includes/constants.inc.php`: Application base URL (`$ROOT`) used for internal links
-	- `includes/session.inc.php`: Session gating for member pages
-- `questkeeper.sql`: Database schema + seed data
+## Architecture (How It’s Put Together)
+- **Server-rendered pages** for primary navigation and forms
+- **JSON endpoints** in the member area for AJAX reads
+- **Shared includes** under `includes/` for configuration, sessions, and helper logic
 
-## Setup
+### Key Entry Points
+- `index.php`: Home page + login
+- `register.php`: Registration
+- `members/`: Authenticated member area
+  - `members/index.php`: Member landing page
+  - `members/addCharacter.php`: New character form
+  - `members/editCharacter.php`: Edit character form
+  - `members/getCharacter.php`: JSON endpoint (`?characterID=...`)
+  - `members/submitNewCharacter.php`: Create character (POST)
+  - `members/updateCharacter.php`: Update character (POST)
+  - `members/logout.php`: Logout
 
-### 1) Create The Database
+### Notable Includes
+- `includes/variables.inc.php`: Loads DB credentials (supports local overrides)
+- `includes/constants.inc.php`: Computes the application base path automatically for internal links
+- `includes/session.inc.php`: Session gating for member pages
+- `includes/bootstrap.inc.php`: Logs fatal errors to `php-error.log` (useful when display_errors is off)
+
+## Local Setup (Developer)
+
+### 1) Create the Database
 Import `questkeeper.sql` into an empty database.
 
 Notes:
 - The SQL dump includes the full schema and seed rows for reference tables.
-- Use an `utf8mb4` character set to match the schema expectations.
+- Use `utf8mb4` where possible (the sample config uses `utf8mb4`).
 
-### 2) Configure Database Credentials
-Copy `includes/db.config.inc.php.example` to `includes/db.config.inc.php` and set:
-- `$host` (database server)
-- `$web_user` and `$pwd` (database credentials)
-- `$dbname` (database name)
+### 2) Configure Database Credentials (Git-Ignored)
+Create `includes/db.config.inc.php` by copying the example:
 
-`includes/db.config.inc.php` is git-ignored so credentials stay out of git.
+- Copy: `includes/db.config.inc.php.example` → `includes/db.config.inc.php`
+- Set: `$host`, `$web_user`, `$pwd`, `$dbname`, `$charset`
 
-### 3) Configure The Application Base URL
-Edit `includes/constants.inc.php` and set `$ROOT` to the externally visible base URL where the app is served (include the scheme and trailing slash).
+Credential loading behavior:
+- `includes/variables.inc.php` prefers `includes/db.config.inc.php`
+- If not present, it falls back to `includes/db.local.inc.php` (also git-ignored)
 
-This value is used to build internal links and form targets throughout the member pages.
+### 3) Serve the Project
+Use any PHP-capable web server (Apache, nginx+php-fpm, IIS) and point it at the project so `index.php` is reachable.
 
-### 4) Serve The Project
-Deploy the project to any PHP-capable web server so that `index.php` is reachable from your browser.
+`includes/constants.inc.php` computes the base path automatically, so you can host:
+- at a domain root (e.g. `http://questkeeper.local/`)
+- in a subfolder (e.g. `http://localhost/2018Questkeeper/`)
 
-## Using The App
+## Using the App
+- Register an account on `register.php`
+- Log in from `index.php`
+- Create or edit characters from the member area
 
-### Register And Log In
-1. Open the home page (`index.php`).
-2. Click **Register** to create an account.
-3. Log in using the login form on the home page.
+## AJAX / JSON Endpoints
+- `members/getCharacter.php?characterID=123` returns JSON for a character row
 
-### Create A Character
-1. After login, you’ll land in the member area.
-2. Choose **Add Character**.
-3. Fill out the sheet and submit to save.
-
-### Edit A Character
-1. In the member area, choose **Edit Character**.
-2. Select a character and update fields.
-3. Save to persist changes.
-
-## AJAX / JSON Endpoints (For Developers)
-The UI uses JSON endpoints to load character data dynamically.
-
-- `members/getCharacter.php?characterID=123` returns a JSON object with the full row from the `characters` table.
-
-## Data Model Overview
-At a high level:
-- `users` stores registered users.
-- `characters` stores a character sheet keyed to a `userID`.
-- Several lookup tables provide 5e reference lists (classes, races, backgrounds, alignments, levels, etc.).
+## Data Model (High Level)
+- `users`: registered users
+- `characters`: character sheets keyed by `userID`
+- Lookup/reference tables: classes, races, backgrounds, alignments, levels, etc.
 
 ## Troubleshooting
 
-### Links Or Form Posts Go To The Wrong Place
-Most navigation is built using `$ROOT`.
+### App Links Look Wrong
+Base-path routing is derived automatically.
 
-- Verify `$ROOT` in `includes/constants.inc.php` matches where you are serving the app from.
-- Ensure it includes a trailing slash.
+- Verify your server is configured with the correct document root.
+- If you are using a reverse proxy or non-standard setup, you may need to adjust URL/path handling.
 
 ### Database Connection Errors
-- Double-check `includes/variables.inc.php` values (host, database name, username, password).
-- Confirm the database user has permissions to read/write the schema created from `questkeeper.sql`.
+- Confirm `includes/db.config.inc.php` exists and has correct credentials.
+- Ensure the DB user can read/write the imported schema.
 
-### Login Doesn’t Work
-- Ensure the database imported cleanly and the `users` table exists.
-- Confirm you’re logging in with the same credentials you registered.
+### Blank Page / HTTP 500
+Check the `php-error.log` file in the project root for fatal error diagnostics.
 
-## Security Notes
-This project was built as a course/portfolio application and is not hardened for production use.
+## Security Notes (Portfolio Context)
+This project is intentionally kept close to its original course-era implementation.
+It is **not** production-hardened.
 
-If you plan to deploy it publicly, you should at minimum:
-- Upgrade password storage to `password_hash()` / `password_verify()` (the current implementation uses MD5)
-- Remove hard-coded credentials from the repository
-- Review SQL usage and add parameterized queries consistently
+If deploying publicly, start with:
+- Replace MD5 password hashing with `password_hash()` / `password_verify()`
+- Add CSRF protection on POST forms
+- Ensure all SQL is consistently parameterized
+- Add rate limiting / lockout for login
 
 ## Credits
-Created by Frank Jamison for UC Davis WEB515 (2018).
-
----
-This project is provided as-is for learning and demonstration purposes.
+Created by Frank Jamison for UC Davis WEB515 (2018). Provided as-is for learning and demonstration.
