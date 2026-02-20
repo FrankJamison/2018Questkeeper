@@ -7,15 +7,28 @@ $pwd = "";
 $dbname = "";
 $charset = "utf8";
 
-// Load environment-specific DB credentials if present (git-ignored)
-// Prefer deployment overrides first, then fall back to the local config.
-$dbLocalPath = __DIR__ . '/db.config.inc.php';
-if (is_file($dbLocalPath)) {
-    require $dbLocalPath;
+// Load environment-specific DB credentials if present.
+// Local dev (localhost) should prefer db.local.inc.php; deployed environments should prefer db.config.inc.php.
+$hostHeader = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? '');
+$isLocalHost = $hostHeader !== '' && (
+    stripos($hostHeader, 'localhost') !== false ||
+    $hostHeader === '127.0.0.1'
+);
+
+$dbConfigPath = __DIR__ . '/db.config.inc.php';
+$dbLocalPath = __DIR__ . '/db.local.inc.php';
+
+if ($isLocalHost) {
+    if (is_file($dbLocalPath)) {
+        require $dbLocalPath;
+    } elseif (is_file($dbConfigPath)) {
+        require $dbConfigPath;
+    }
 } else {
-    $dbConfigPath = __DIR__ . '/db.local.inc.php';
     if (is_file($dbConfigPath)) {
         require $dbConfigPath;
+    } elseif (is_file($dbLocalPath)) {
+        require $dbLocalPath;
     }
 }
 $dbc = 0;

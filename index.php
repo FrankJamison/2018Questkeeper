@@ -23,13 +23,19 @@ if (!function_exists('mysqli_connect')) {
 	die('QuestKeeper error: PHP mysqli extension is not enabled. Enable/ install mysqli for your PHP runtime.');
 }
 
-$dbc = @mysqli_connect($host, $web_user, $pwd, $dbname);
+$connectError = null;
+try {
+	$dbc = @mysqli_connect($host, $web_user, $pwd, $dbname);
+} catch (mysqli_sql_exception $e) {
+	$dbc = false;
+	$connectError = $e->getMessage();
+}
 if (!$dbc) {
 	http_response_code(500);
-	$message = 'QuestKeeper error: failed to connect to MySQL. Check includes/db.config.inc.php (preferred) or includes/db.local.inc.php.';
+	$message = 'QuestKeeper error: failed to connect to MySQL. For local dev, set includes/db.local.inc.php; for deployed environments, set includes/db.config.inc.php.';
 	$isLocal = isset($_SERVER['HTTP_HOST']) && stripos($_SERVER['HTTP_HOST'], 'localhost') !== false;
 	if ($isLocal) {
-		$message .= "\n\nMySQL error: " . mysqli_connect_error();
+		$message .= "\n\nMySQL error: " . ($connectError ?: mysqli_connect_error());
 	}
 	die(nl2br(htmlspecialchars($message, ENT_QUOTES)));
 }
@@ -45,7 +51,7 @@ userLogin($dbc, $error_text, $ROOT);
 
 <head>
 
-	<title>Quest Keeper - Home Page</title>
+	<title>QuestKeeper | A D&amp;D 5e Character Tracker</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 

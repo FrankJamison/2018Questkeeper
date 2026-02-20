@@ -33,7 +33,7 @@ header("Refresh: 8; $ROOT/index.php");
 <html lang="en">
 
 <head>
-	<title>Quest Keeper - Logout</title>
+	<title>QuestKeeper | A D&amp;D 5e Character Tracker</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 

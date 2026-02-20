@@ -5,9 +5,7 @@ var strengthMod = 0;
 /* Base URL function
 -------------------------------------------------------------------*/
 $(document).ready(function(e) {
-
-    var baseURL = 'http://localhost/174WEB515/FinalProject';
-
+    // No hard-coded base URL.
 });
 
 

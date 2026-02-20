@@ -24,13 +24,19 @@ if (!function_exists('mysqli_connect')) {
     exit;
 }
 
-$dbc = @mysqli_connect($host, $web_user, $pwd, $dbname);
+$connectError = null;
+try {
+    $dbc = @mysqli_connect($host, $web_user, $pwd, $dbname);
+} catch (mysqli_sql_exception $e) {
+    $dbc = false;
+    $connectError = $e->getMessage();
+}
 if (!$dbc) {
     http_response_code(500);
-    $message = 'QuestKeeper error: failed to connect to MySQL. Check includes/db.local.inc.php (preferred) or includes/db.config.inc.php.';
+    $message = 'QuestKeeper error: failed to connect to MySQL. For local dev, set includes/db.local.inc.php; for deployed environments, set includes/db.config.inc.php.';
     $isLocal = isset($_SERVER['HTTP_HOST']) && stripos($_SERVER['HTTP_HOST'], 'localhost') !== false;
     if ($isLocal) {
-        $message .= ' MySQL error: ' . mysqli_connect_error();
+        $message .= ' MySQL error: ' . ($connectError ?: mysqli_connect_error());
     }
     echo json_encode(['error' => $message]);
     exit;
@@ -57,12 +63,14 @@ $sql = "SELECT * FROM characters WHERE characterID = $characterID";
 $result = mysqli_query($dbc, $sql);
 
 if (!$result) {
-    echo "Could not successfully run query ($sql) from DB: " . mysql_error();
+    http_response_code(500);
+    echo json_encode(['error' => 'Could not successfully run query', 'details' => mysqli_error($dbc)]);
     exit;
 }
 
 if (mysqli_num_rows($result) == 0) {
-    echo "No rows found, nothing to print so am exiting";
+    http_response_code(404);
+    echo json_encode(['error' => 'Character not found']);
     exit;
 }
 
